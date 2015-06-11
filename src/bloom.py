@@ -20,6 +20,9 @@ class BitArray(object):
 		val = 1 if int((self.array[index] & (1 << offset))) > 0 else  0
 		return val
 
+	def isBitSet(self, bit):
+		return (self.getBit(bit) == 1)
+
 	def setBit(self, index):
 		offset = index % self.indexSize
 		index = index / self.indexSize
@@ -42,15 +45,26 @@ class BloomFilter(object):
 
 	def _hash(self, k, val):
 		return mmh3.hash(val, self.ivs[k])
+
+	def _digestToBitIndices(self, digest):
+		pass
 		
 	def insert(self, val):
 		for k in range(self.k):
 			digest = self._hash(k, val)
-			# insert each bit into the bit array
-		pass
+			bits = self._digestToBitIndices(digest)
+
+			for b in bits:
+				self.array.setBit(b)
 
 	def contains(self, element):
-		pass
+		for k in range(self.k):
+			digest = self._hash(k, val)
+			bits = self._digestToBitIndices(digest)
+			for b in bits:
+				if not self.array.isBitSet(b):
+					return False
+		return True
 
 def playWithArray(n):
 	array = BitArray(n)
