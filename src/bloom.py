@@ -72,7 +72,6 @@ class BloomFilter(object):
 	def insert(self, val):
 		for k in range(self.k):
 			bits = self._hash(k, val)
-			# print "bits: ", bits, len(bits)
 			bitIndices = self._digestToBitIndices(bits)
 			for b in bitIndices:
 				self.array.setBit(b)
