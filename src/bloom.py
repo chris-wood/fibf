@@ -4,6 +4,7 @@ import sys
 import math
 import mmh3
 import random
+import binascii
 
 class BitArray(object):
 	def __init__(self, length):
@@ -13,6 +14,9 @@ class BitArray(object):
 
 	def __str__(self):
 		return "Array["+ str(self.length * self.indexSize) + "]: " + str(self.array)
+
+	def expansionFactor(self, base):
+		return (self.length * self.indexSize) / base
 
 	def getBit(self, index):
 		offset = index % self.indexSize
@@ -34,6 +38,7 @@ class BloomFilter(object):
 		self.k = k
 
 		self.array = BitArray(n)
+		self.expansionFactor = self.array.expansionFactor(128) # _hash returns 128 bits
 
 		# Create the k hash functions
 		self.ivs = []
@@ -44,24 +49,39 @@ class BloomFilter(object):
 			self.ivs.append(val)
 
 	def _hash(self, k, val):
-		return mmh3.hash(val, self.ivs[k])
+		''' Return 128-bits as bytes
+		'''
+		bits = "" 
+		for e in range(self.expansionFactor):
+			digest = mmh3.hash_bytes(str(val) + str(e), self.ivs[k])
+			bits = bits + digest
+		return bits
 
 	def _digestToBitIndices(self, digest):
-		pass
+		indices = []
+
+		bitString = int(binascii.b2a_hex(digest), 16)
+
+		bitRange = len(digest) * 8 # digest is a byte-string
+		for index in range(bitRange):
+			if ((1 << index) & (bitString) > 0):
+				indices.append(index)
+
+		return indices
 		
 	def insert(self, val):
 		for k in range(self.k):
-			digest = self._hash(k, val)
-			bits = self._digestToBitIndices(digest)
-
-			for b in bits:
+			bits = self._hash(k, val)
+			# print "bits: ", bits, len(bits)
+			bitIndices = self._digestToBitIndices(bits)
+			for b in bitIndices:
 				self.array.setBit(b)
 
 	def contains(self, element):
 		for k in range(self.k):
-			digest = self._hash(k, val)
-			bits = self._digestToBitIndices(digest)
-			for b in bits:
+			bits = self._hash(k, str(element))
+			bitIndices = self._digestToBitIndices(bits)
+			for b in bitIndices:
 				if not self.array.isBitSet(b):
 					return False
 		return True
@@ -74,15 +94,20 @@ def playWithArray(n):
 	print array.getBit(4)
 	print array.getBit(5)
 
+def playWithFilter(n, k = 2):
+	bf = BloomFilter(n, 2)
+	v1 = "rawrawrawrawrawrawrawrawr"
+	bf.insert(v1)
+	print bf.contains("hello?")
+	print bf.contains(v1)
+
 def main(args):
 	n = int(sys.argv[1])
-	playWithArray(n)
+	k = int(sys.argv[2])
 
-	
-	
-	# return OK
-	pass
+	# stupid tests...
+	playWithArray(n)
+	playWithFilter(n, k)
 
 if __name__ == "__main__":
 	main(sys.argv)
-
