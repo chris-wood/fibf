@@ -4,6 +4,7 @@ import sys
 import math
 import mmh3
 import random
+import string
 import binascii
 
 class BitArray(object):
@@ -100,6 +101,20 @@ def playWithFilter(n, k = 2):
 	print bf.contains("hello?")
 	print bf.contains(v1)
 
+def findCollision(n, k = 2):
+	bf = BloomFilter(n, 2)
+	test = "Hello world"
+	bf.insert(test)
+	print bf.contains(test)
+	found = False
+	val = ""
+	while not found:
+		val = (''.join(random.choice(string.ascii_uppercase) for i in range(128)))
+		if bf.contains(val):
+			print "Found collision", test, val
+			found = True
+	return test, val
+
 def main(args):
 	n = int(sys.argv[1])
 	k = int(sys.argv[2])
@@ -107,6 +122,7 @@ def main(args):
 	# stupid tests...
 	playWithArray(n)
 	playWithFilter(n, k)
+	findCollision(n, k)
 
 if __name__ == "__main__":
 	main(sys.argv)
