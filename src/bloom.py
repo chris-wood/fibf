@@ -124,5 +124,7 @@ def main(args):
 	playWithFilter(n, k)
 	findCollision(n, k)
 
+	return
+
 if __name__ == "__main__":
 	main(sys.argv)
