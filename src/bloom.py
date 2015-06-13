@@ -108,5 +108,7 @@ def main(args):
 	playWithArray(n)
 	playWithFilter(n, k)
 
+	return
+
 if __name__ == "__main__":
 	main(sys.argv)
