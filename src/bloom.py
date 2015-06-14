@@ -98,8 +98,9 @@ def playWithFilter(n, k = 2):
 	bf = BloomFilter(n, 2)
 	v1 = "rawrawrawrawrawrawrawrawr"
 	bf.insert(v1)
-	print bf.contains("hello?")
+	print bf.contains("the opposite of rawr rawr")
 	print bf.contains(v1)
+	print bf.array
 
 def findCollision(n, k = 2):
 	bf = BloomFilter(n, 2)
@@ -108,7 +109,7 @@ def findCollision(n, k = 2):
 	print bf.contains(test)
 	found = False
 	val = ""
-	while not found:
+	while not found: # terrible collision search
 		val = (''.join(random.choice(string.ascii_uppercase) for i in range(128)))
 		if bf.contains(val):
 			print "Found collision", test, val
@@ -116,13 +117,13 @@ def findCollision(n, k = 2):
 	return test, val
 
 def main(args):
-	n = int(sys.argv[1])
-	k = int(sys.argv[2])
+	n = int(args[1])
+	k = int(args[2])
 
 	# stupid tests...
 	playWithArray(n)
 	playWithFilter(n, k)
-	findCollision(n, k)
+	# findCollision(n, k)
 
 	return
 
