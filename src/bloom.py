@@ -59,7 +59,7 @@ class BloomFilter(object):
 		'''
 		bits = "" 
 		for e in range(self.expansionFactor):
-			cipher = AES.new(self.ivs[k], AES.MODE_CBC, 'This is an IV456') 
+			cipher = AES.new(self.ivs[k], AES.MODE_CBC, IV) 
 			encrInput = mmh3.hash_bytes(str(val) + str(e), e)
 			digest = cipher.encrypt(encrInput)
 			bits = bits + digest
@@ -69,8 +69,8 @@ class BloomFilter(object):
 		indices = []
 
 		bitString = int(binascii.b2a_hex(digest), 16)
+		bitRange = len(digest) * 8 # digest is a byte string
 
-		bitRange = len(digest) * 8 # digest is a byte-string
 		for index in range(bitRange):
 			if ((1 << index) & (bitString) > 0):
 				indices.append(index)
