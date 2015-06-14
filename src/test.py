@@ -9,6 +9,19 @@ def sxor(s1,s2):
 def randomString(length):
 	return (''.join(random.choice(string.ascii_uppercase) for i in range(length)))
 
+###### TODO:
+# 1. This procedure is done for every component in the name
+# 2. Add this cache support
+
+###### NOTES:
+# 1. PIT still contains provided name and IV
+# 2. The cache is indexed by hash of the name
+# 3. Interest payload contains the encrypted version of the interest name and additional data
+
+###### QUESTIONS:
+# 1. Is this different (used in addition to, better than?) than l2 encryption?
+# 2. What are the benefits aside from per-hop name switching? [it hides the routable name prefix]
+
 # router computes this when inserting into FIB
 fibKEY = 'This is a key123' # permanent key for the router 
 fibIV = 'This is an IV456' # IV used when inserting into the FIB, fixed
