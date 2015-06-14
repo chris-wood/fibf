@@ -6,6 +6,8 @@ import mmh3
 import random
 import string
 import binascii
+import hashlib
+from Crypto.Cipher import AES
 
 class BitArray(object):
 	def __init__(self, length):
@@ -39,22 +41,27 @@ class BloomFilter(object):
 		self.k = k
 
 		self.array = BitArray(n)
-		self.expansionFactor = self.array.expansionFactor(128) # _hash returns 128 bits
+		self.expansionFactor = self.array.expansionFactor(128) # _digest returns 128 bits
 
 		# Create the k hash functions
 		self.ivs = []
 		for i in range(k):
-			val = random.randint(0, seedLimit)
+			val = self._randomString(16)
 			while val in self.ivs:
-				val = random.randint(0, seedLimit)
+				val = self._randomString(16)
 			self.ivs.append(val)
 
-	def _hash(self, k, val):
+	def _randomString(self, length):
+		return (''.join(random.choice(string.ascii_uppercase) for i in range(length)))
+
+	def _digest(self, k, val):
 		''' Return 128-bits as bytes
 		'''
 		bits = "" 
 		for e in range(self.expansionFactor):
-			digest = mmh3.hash_bytes(str(val) + str(e), self.ivs[k])
+			cipher = AES.new(self.ivs[k], AES.MODE_CBC, 'This is an IV456') 
+			encrInput = mmh3.hash_bytes(str(val) + str(e), e)
+			digest = cipher.encrypt(encrInput)
 			bits = bits + digest
 		return bits
 
@@ -72,14 +79,14 @@ class BloomFilter(object):
 		
 	def insert(self, val):
 		for k in range(self.k):
-			bits = self._hash(k, val)
+			bits = self._digest(k, val)
 			bitIndices = self._digestToBitIndices(bits)
 			for b in bitIndices:
 				self.array.setBit(b)
 
 	def contains(self, element):
 		for k in range(self.k):
-			bits = self._hash(k, str(element))
+			bits = self._digest(k, str(element))
 			bitIndices = self._digestToBitIndices(bits)
 			for b in bitIndices:
 				if not self.array.isBitSet(b):
@@ -121,7 +128,7 @@ def main(args):
 	k = int(args[2])
 
 	# stupid tests...
-	playWithArray(n)
+	# playWithArray(n)
 	playWithFilter(n, k)
 	# findCollision(n, k)
 
