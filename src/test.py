@@ -25,13 +25,52 @@ class Forwarder(object):
     def __init__(self):
         pass
 
-class ContentStore(object):
+class HashTable(object):
     def __init__(self):
-        pass
+        self.table = {}
 
-class FIB(object):
+    def insert(self, key, val):
+        self.table[key] = val
+
+    def contains(self, index):
+        return index in self.table
+
+    def retrieve(self, index):
+        if self.contains(index):
+            return self.table[index]
+
+class ContentStore(HashTable):
+    pass # a content store is just a glorified hash table
+
+class FIB(HashTable):
     def __init__(self):
-        pass
+        ContentStore.__init__(self)
+
+    def insert(self, key, val):
+        components = key.split("/")
+        for index, component in enumerate(components):
+            prefix = "/".join(components[0: index + 1]
+            super(FIB, self).insert(prefix, val)
+
+    def _findMatches(self, index):
+        components = index.split("/")
+        matches = []
+        for index, component in enumerate(components):
+            prefix = "/".join(components[0:index + 1]
+            if super(FIB, self).contains(prefix):
+                matches.append(prefix)
+
+    def contains(self, index):
+        return len(self._findMatches(index)) > 0
+
+    def retrieve(self, index):
+        matches = self._findMatches(index)
+        values = []
+        for match in matches:
+            value = super(FIB, self).retrieve(match)
+            values.append(value)
+        return values
+        
 
 ###### TODO:
 # 1. This procedure is done for every component in the name
