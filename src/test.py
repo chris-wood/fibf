@@ -9,6 +9,30 @@ def sxor(s1,s2):
 def randomString(length):
 	return (''.join(random.choice(string.ascii_uppercase) for i in range(length)))
 
+class Interest(object):
+    def __init__(self):
+        pass
+
+class ContentObject(object):
+    def __init__(self):
+        pass
+
+class RouterMessage(object):
+    def __init__(self):
+        pass
+
+class Forwarder(object):
+    def __init__(self):
+        pass
+
+class ContentStore(object):
+    def __init__(self):
+        pass
+
+class FIB(object):
+    def __init__(self):
+        pass
+
 ###### TODO:
 # 1. This procedure is done for every component in the name
 # 2. Add this cache support
