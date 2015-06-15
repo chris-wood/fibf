@@ -97,20 +97,30 @@ class FIB(HashTable):
 f1 = Forwarder()
 name1 = "/a/b/c"
 name2 = "/a/b/d"
+print "Inserting %s" % (name1)
 f1.fib.insert(name1, 0)
+print "Does the FIB contain the prefix for %s ?" % (name2),
 print f1.fib.containsPrefix(name2, f1.fib.insertIV)
+print "These are the prefixes (in their encoded form) ",
 print f1.fib.lookup(name2, f1.fib.insertIV)
+print "Does it contain the full name %s ? " % (name2),
 print f1.fib.containsFullName(name2, f1.fib.insertIV)
 
 # Create a new random name that maps to name1, using a different IV
 randomIV = randomString(16)
 decrypter = AES.new(f1.fib.indexKey, AES.MODE_CBC, randomIV)
 ciphertext = f1.fib._insertPrefix(name1, f1.fib.insertIV)
+print "Generating a new random representation of the target name %s..." % (name1)
 randomName = decrypter.decrypt(ciphertext)
+print "We got %s" % (randomName)
+
+print "Does the FIB contain this new random name %s? " % (randomName),
 print f1.fib.containsFullName(randomName, randomIV)
 
 # Verify that name1 \not= randomname
+print "Are these names equal?"
 print name1, randomName, name1 == randomName
+print "Definitely not!"
 
 
 
