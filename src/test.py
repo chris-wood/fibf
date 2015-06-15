@@ -50,17 +50,20 @@ class FIB(HashTable):
         self.indexKey = randomString(16)
         self.insertIV = randomString(16)
 
-    def _insertPrefix(self, prefix, IV):
+    def _insertPrefix(self, originalPrefix, IV):
+        prefix = originalPrefix
         padLength = len(prefix) % 16
         prefix = prefix + (" " * (16 - padLength)) if padLength > 0 else prefix
         inserter = AES.new(self.indexKey, AES.MODE_CBC, IV)
-        return inserter.encrypt(prefix)
+        return inserter.encrypt(prefix), originalPrefix
 
     def insert(self, key, val):
         components = key.split("/")
         for index, component in enumerate(components):
-            prefix = self._insertPrefix("/".join(components[0: index + 1]), self.insertIV)
-            super(FIB, self).insert(prefix, val)
+            if index == 0:
+                continue
+            prefix, original = self._insertPrefix("/".join(components[0: index + 1]), self.insertIV)
+            super(FIB, self).insert(prefix, (val, original))
 
     def _findMatches(self, indexValue, IV):
         components = indexValue.split("/")
@@ -69,7 +72,7 @@ class FIB(HashTable):
             if index == 0:
                 continue # the empty name
             plaintext = "/".join(components[0:index + 1])
-            prefix = self._insertPrefix(plaintext, IV)
+            prefix, original = self._insertPrefix(plaintext, IV)
             if super(FIB, self).contains(prefix):
                 matches.append(prefix)
    
@@ -90,37 +93,58 @@ class FIB(HashTable):
         return values 
 
     def containsFullName(self, index, IV):
-        prefix = self._insertPrefix(index, IV)
+        prefix, original = self._insertPrefix(index, IV)
         return super(FIB, self).contains(prefix)
+
+    def __str__(self):
+        if len(self.table) == 0:
+            return "FIB = []"
+        rep = "FIB = [\n"
+        for k in self.table:
+            v = self.table[k]
+            rep = rep + "\t{\n"
+            rep = rep + "\t\t Prefix[%s]: Interface[%s], EncodedName[%s]\n" % (v[1], v[0], k)
+            rep = rep + "\t},\n"
+        rep = rep + "]"
+        return rep
 
 # Test the forwarder FIB
 f1 = Forwarder()
 name1 = "/a/b/c"
 name2 = "/a/b/d"
-print "Inserting %s" % (name1)
+
+print ">>> To begin, the FIB is empty..."
+print f1.fib
+print ">>> Inserting %s..." % (name1)
 f1.fib.insert(name1, 0)
-print "Does the FIB contain the prefix for %s ?" % (name2),
+print f1.fib
+
+print ">>> Does the FIB contain the prefix for %s ?" % (name2),
 print f1.fib.containsPrefix(name2, f1.fib.insertIV)
-print "These are the prefixes (in their encoded form) ",
+print ""
+print ">>> These are the prefixes (in their encoded form) ",
 print f1.fib.lookup(name2, f1.fib.insertIV)
-print "Does it contain the full name %s ? " % (name2),
+print ""
+print ">>> Does it contain the full name %s ? " % (name2),
 print f1.fib.containsFullName(name2, f1.fib.insertIV)
+print ""
 
 # Create a new random name that maps to name1, using a different IV
 randomIV = randomString(16)
 decrypter = AES.new(f1.fib.indexKey, AES.MODE_CBC, randomIV)
-ciphertext = f1.fib._insertPrefix(name1, f1.fib.insertIV)
-print "Generating a new random representation of the target name %s..." % (name1)
+ciphertext, original = f1.fib._insertPrefix(name1, f1.fib.insertIV)
+print ">>> Generating a new random representation of the target name %s..." % (name1)
 randomName = decrypter.decrypt(ciphertext)
-print "We got %s" % (randomName)
+print ">>> We got %s " % (randomName)
+print ""
 
-print "Does the FIB contain this new random name %s? " % (randomName),
+print ">>> Does the FIB contain the **encoding** of this random name %s ? " % (randomName),
 print f1.fib.containsFullName(randomName, randomIV)
 
 # Verify that name1 \not= randomname
-print "Are these names equal?"
-print name1, randomName, name1 == randomName
-print "Definitely not!"
+print ">>> Are these names equal?"
+print "\tName 1: %s\n\tName 2: %s\n\tEqual? %d" % (name1, randomName, name1 == randomName)
+print ">>> Definitely not!"
 
 
 
