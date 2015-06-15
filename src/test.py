@@ -170,5 +170,3 @@ def test():
     encrypter = AES.new(fibKEY, AES.MODE_CBC, newIV)
     indexedCiphertext = encrypter.encrypt(newData)
     print "Correct output?", indexedCiphertext == cipher_textA
-
-
