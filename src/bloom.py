@@ -10,7 +10,6 @@ import hashlib
 import threading
 from Crypto.Cipher import AES
 from bitarray import *
-#from countingarray import *
 
 class BloomFilter(object):
     def __init__(self, array, k, seedLimit = 1000):
