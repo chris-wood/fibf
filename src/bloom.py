@@ -10,17 +10,13 @@ import hashlib
 import threading
 from Crypto.Cipher import AES
 from bitarray import *
-
-class CountingBloomFilter(object):
-    def __init__(self, n, k, seedLimit = 1000):
-        pass
+#from countingarray import *
 
 class BloomFilter(object):
-    def __init__(self, n, k, seedLimit = 1000):
-        self.n = n
+    def __init__(self, array, k, seedLimit = 1000):
         self.k = k
 
-        self.array = BitArray(n)
+        self.array = array
         self.expansionFactor = self.array.expansionFactor(128) # _digest returns 128 bits
 
         # Create the k hash functions
@@ -74,8 +70,18 @@ class BloomFilter(object):
                     return False
         return True
 
+class CountingBloomFilter(BloomFilter):
+    def __init__(self, n, k, seedLimit = 1000):
+        array = CountingArray(n)
+        BloomFilter.__init__(self, array, k, seedLimit)
+
+class StandardBloomFilter(BloomFilter):
+    def __init__(self, n, k, seedLimit = 1000):
+        array = BitArray(n)
+        BloomFilter.__init__(self, array, k, seedLimit)
+
 def playWithFilter(n, k = 2):
-    bf = BloomFilter(n, 2)
+    bf = StandardBloomFilter(n, 2)
     v1 = "rawrawrawrawrawrawrawrawr"
     bf.insert(v1)
     print bf.contains("the opposite of rawr rawr")
@@ -83,7 +89,7 @@ def playWithFilter(n, k = 2):
     print bf.array
 
 def findCollision(n, k = 2):
-    bf = BloomFilter(n, 2)
+    bf = StandardBloomFilter(n, 2)
     test = "Hello world"
     bf.insert(test)
     print bf.contains(test)
