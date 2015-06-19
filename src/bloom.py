@@ -69,6 +69,11 @@ class BloomFilter(object):
                     return False
         return True
 
+class DecayingBloomFilter(BloomFilter):
+    def __init__(self, n, k, seedLimit = 1000):
+        array = CountingArray(n)
+        BloomFilter.__init__(self, array, k, seedLimit)
+
 class CountingBloomFilter(BloomFilter):
     def __init__(self, n, k, seedLimit = 1000):
         array = CountingArray(n)

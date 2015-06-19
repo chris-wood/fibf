@@ -1,4 +1,5 @@
 import math
+from threading import Thread, Lock
 
 class BitArray(object):
 	''' Simple implementation of a bitarray or bitmap.
@@ -35,6 +36,7 @@ class CoutingArray(object):
 		''' Each entry is a counter, not a single bit.
 		'''
 		self.array = [0,] * self.length
+		self.lock = Lock()
 
 	def __str__(self):
 		return "CountingArray["+ str(self.length) + "]: " + str(self.array)
@@ -43,16 +45,30 @@ class CoutingArray(object):
 		return self.length / base
 
 	def getValue(self, index):
-		return self.array[index]
+		mutex.acquire()
+		value = 0
+		try:
+			value = self.array[index]
+		finally:
+			mutex.release()
+		return value
 
 	def isEmpty(self, bit):
 		return (self.getCount(bit) == 0)
 
 	def addAt(self, index):
-		self.array[index] += 1
-		
+		mutex.acquire()
+		try:
+			self.array[index] += 1
+		finally:
+			mutex.release()
+
 	def removeAt(self, index):
-		if self.array[index] > 0:
-			self.array[index] -= 1
-		else:
-			pass # this not an exception
+		mutex.acquire()
+		try:
+			if self.array[index] > 0:
+				self.array[index] += 1
+			else:
+				pass # this is not an exception
+		finally:
+			mutex.release()
