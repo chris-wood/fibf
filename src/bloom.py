@@ -31,15 +31,21 @@ class BloomFilter(object):
     def _randomString(self, length):
         return (''.join(random.choice(string.ascii_uppercase) for i in range(length)))
 
+    def _hashDigest(self, key, val, iv):
+        return mmh3.hash_bytes(str(val) + str(iv), key)
+
+    def _encryptionDigest(self, key, val, iv):
+        cipher = AES.new(key, AES.MODE_CBC, IV)
+        encrInput = mmh3.hash_bytes(str(val) + str(iv), iv)
+        digest = cipher.encrypt(encrInput)
+        return digest
+
     def _digest(self, k, val):
         ''' Return 128-bits as bytes
         '''
         bits = "" 
         for e in range(self.expansionFactor):
-            #cipher = AES.new(self.ivs[k], AES.MODE_CBC, IV) 
-            #encrInput = mmh3.hash_bytes(str(val) + str(e), e)
-            #digest = cipher.encrypt(encrInput)
-            digest = mmh3.hash_bytes(str(val) + str(e), self.ivs[k])
+            digest = self._hashDigest(self.ivs[k], str(val), str(e))
             bits = bits + digest
         return bits
 
