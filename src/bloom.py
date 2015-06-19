@@ -7,8 +7,13 @@ import random
 import string
 import binascii
 import hashlib
+import threading
 from Crypto.Cipher import AES
 from bitarray import *
+
+class CountingBloomFilter(object):
+    def __init__(self, n, k, seedLimit = 1000):
+        pass
 
 class BloomFilter(object):
     def __init__(self, n, k, seedLimit = 1000):
@@ -21,10 +26,8 @@ class BloomFilter(object):
         # Create the k hash functions
         self.ivs = []
         for i in range(k):
-            #val = self._randomString(16)
             val = random.randint(0, seedLimit)
             while val in self.ivs:
-                #val = self._randomString(16)
                 val = random.randint(0, seedLimit)
             self.ivs.append(val)
 
@@ -33,12 +36,6 @@ class BloomFilter(object):
 
     def _hashDigest(self, key, val, iv):
         return mmh3.hash_bytes(str(val) + str(iv), key)
-
-    def _encryptionDigest(self, key, val, iv):
-        cipher = AES.new(key, AES.MODE_CBC, IV)
-        encrInput = mmh3.hash_bytes(str(val) + str(iv), iv)
-        digest = cipher.encrypt(encrInput)
-        return digest
 
     def _digest(self, k, val):
         ''' Return 128-bits as bytes
@@ -77,14 +74,6 @@ class BloomFilter(object):
                     return False
         return True
 
-def playWithArray(n):
-    array = BitArray(n)
-    print array
-    array.setBit(4)
-    print array
-    print array.getBit(4)
-    print array.getBit(5)
-
 def playWithFilter(n, k = 2):
     bf = BloomFilter(n, 2)
     v1 = "rawrawrawrawrawrawrawrawr"
@@ -112,7 +101,6 @@ def main(args):
     k = int(args[2])
 
     # stupid tests...
-    # playWithArray(n)
     playWithFilter(n, k)
     # findCollision(n, k)
 
