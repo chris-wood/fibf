@@ -70,9 +70,18 @@ class BloomFilter(object):
         return True
 
 class DecayingBloomFilter(BloomFilter):
-    def __init__(self, n, k, seedLimit = 1000):
-        array = CountingArray(n)
-        BloomFilter.__init__(self, array, k, seedLimit)
+    def __init__(self, n, k, updateInterval, seedLimit = 1000):
+        self.array = CountingArray(n)
+        self.updateInterval = updateInterval
+        BloomFilter.__init__(self, self.array, k, seedLimit)
+        t = threading.Thread(target=decay, args=(self.array, self.updateInterval))
+        t.start()
+
+    def decay(array, updateInterval):
+        while True: # need to accept poison pills here
+            for index in self.array.size():
+                self.array.removeAt(index)
+            time.sleep(updateInterval)
 
 class CountingBloomFilter(BloomFilter):
     def __init__(self, n, k, seedLimit = 1000):

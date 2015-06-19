@@ -12,6 +12,9 @@ class BitArray(object):
 	def __str__(self):
 		return "Array["+ str(self.length * self.indexSize) + "]: " + str(self.array)
 
+	def size(self):
+		return self.length * self.indexSize
+
 	def expansionFactor(self, base):
 		return (self.length * self.indexSize) / base
 
@@ -40,6 +43,9 @@ class CoutingArray(object):
 
 	def __str__(self):
 		return "CountingArray["+ str(self.length) + "]: " + str(self.array)
+
+	def size(self):
+		return self.length
 
 	def expansionFactor(self, base):
 		return self.length / base
