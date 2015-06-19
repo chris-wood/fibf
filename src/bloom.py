@@ -8,6 +8,7 @@ import string
 import binascii
 import hashlib
 import threading
+import time
 from Crypto.Cipher import AES
 from bitarray import *
 
@@ -69,19 +70,26 @@ class BloomFilter(object):
                     return False
         return True
 
+class Decayer(threading.Thread):
+    def __init__(self, array, updateInterval):
+        threading.Thread.__init__(self)
+        self.array = array
+        self.updateInterval = updateInterval
+
+    def run(self):
+        while True:
+            for index in range(self.array.size()):
+                self.array.removeAt(index)
+            time.sleep(self.updateInterval)
+            print self.array
+
 class DecayingBloomFilter(BloomFilter):
     def __init__(self, n, k, updateInterval, seedLimit = 1000):
         self.array = CountingArray(n)
         self.updateInterval = updateInterval
         BloomFilter.__init__(self, self.array, k, seedLimit)
-        t = threading.Thread(target=decay, args=(self.array, self.updateInterval))
-        t.start()
-
-    def decay(array, updateInterval):
-        while True: # need to accept poison pills here
-            for index in self.array.size():
-                self.array.removeAt(index)
-            time.sleep(updateInterval)
+        decayer = Decayer(self.array, self.updateInterval)
+        decayer.start()
 
 class CountingBloomFilter(BloomFilter):
     def __init__(self, n, k, seedLimit = 1000):
@@ -97,9 +105,16 @@ def playWithFilter(n, k = 2):
     bf = StandardBloomFilter(n, 2)
     v1 = "rawrawrawrawrawrawrawrawr"
     bf.insert(v1)
-    print bf.contains("the opposite of rawr rawr")
-    print bf.contains(v1)
+    print "Contains an unequal string?", bf.contains("the opposite of rawr rawr")
+    print "Contains the original string?", bf.contains(v1)
     print bf.array
+
+
+    b2 = DecayingBloomFilter(n, 2, 0.5)
+    b2.insert(v1)
+    print b2.array
+    time.sleep(2)
+    print b2.array
 
 def findCollision(n, k = 2):
     bf = StandardBloomFilter(n, 2)
