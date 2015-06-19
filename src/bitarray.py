@@ -14,16 +14,16 @@ class BitArray(object):
 	def expansionFactor(self, base):
 		return (self.length * self.indexSize) / base
 
-	def getBit(self, index):
+	def getValue(self, index):
 		offset = index % self.indexSize
 		index = index / self.indexSize
 		val = 1 if int((self.array[index] & (1 << offset))) > 0 else  0
 		return val
 
-	def isBitSet(self, bit):
-		return (self.getBit(bit) == 1)
+	def isEmpty(self, bit):
+		return (self.getValue(bit) == 0)
 
-	def setBit(self, index):
+	def addAt(self, index):
 		offset = index % self.indexSize
 		index = index / self.indexSize
 		self.array[index] = self.array[index] | (1 << offset)

@@ -36,7 +36,7 @@ class BloomFilter(object):
     def _digest(self, k, val):
         ''' Return 128-bits as bytes
         '''
-        bits = "" 
+        bits = ""
         for e in range(self.expansionFactor):
             digest = self._hashDigest(self.ivs[k], str(val), str(e))
             bits = bits + digest
@@ -53,20 +53,20 @@ class BloomFilter(object):
                 indices.append(index)
 
         return indices
-        
+
     def insert(self, val):
         for k in range(self.k):
             bits = self._digest(k, val)
             bitIndices = self._digestToBitIndices(bits)
             for b in bitIndices:
-                self.array.setBit(b)
+                self.array.addAt(b)
 
     def contains(self, element):
         for k in range(self.k):
             bits = self._digest(k, str(element))
             bitIndices = self._digestToBitIndices(bits)
             for b in bitIndices:
-                if not self.array.isBitSet(b):
+                if self.array.isEmpty(b):
                     return False
         return True
 
