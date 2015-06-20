@@ -70,9 +70,9 @@ def main(args):
 
         start = time.time()
 
-        # for content in contents:
-            # if not bf.contains(content):
-                # falseNegatives[t].append(content)
+        for content in contents:
+            if not bf.contains(content):
+                falseNegatives[t].append(content)
 
         randomContents = generateRandomContent(randomSampleSize)
         for randomElement in randomContents:
