@@ -52,7 +52,7 @@ def main(args):
     falsePositives = {}
     falseNegatives = {}
 
-    # TODO: time between intervals needs to be modeled by poisson process
+    # TODO: create counter for arrival and deletion based on poisson process
 
     for t in range(timeSteps):
         if (t % decayInterval) == 0: # decay algorithm here...
@@ -70,10 +70,12 @@ def main(args):
 
         start = time.time()
 
+        # Check to see if decays deleted existing items from the filter
         for content in contents:
             if not bf.contains(content):
                 falseNegatives[t].append(content)
 
+        # Check the false positive rate (by randomly generated samples)
         randomContents = generateRandomContent(randomSampleSize)
         for randomElement in randomContents:
             element = randomElement + str(os.urandom(1))
