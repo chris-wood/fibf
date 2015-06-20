@@ -96,6 +96,13 @@ class CountingBloomFilter(BloomFilter):
         array = CountingArray(n)
         BloomFilter.__init__(self, array, k, seedLimit)
 
+    def delete(self, val):
+        for k in range(self.k):
+            bits = self._digest(k, val)
+            bitIndices = self._digestToBitIndices(bits)
+            for b in bitIndices:
+                self.array.removeAt(b)
+
 class StandardBloomFilter(BloomFilter):
     def __init__(self, n, k, seedLimit = 1000):
         array = BitArray(n)

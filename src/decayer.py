@@ -3,10 +3,18 @@ import random
 from bloom import *
 
 minimumTimeUnit = 1000 # milliseconds
+sequenceNumber = 1
+
+def deleteFromFilter(bf):
+    pass
 
 def generateNewContent():
-    return ""
+    global sequenceNumber
+    name = "lci:/random/" + str(sequenceNumber)
+    sequenceNumber += 1
+    return name
 
+# NOTE: this does not model the cache
 def main(args):
     global minimumTimeUnit
     timeSteps = int(args[0]) % epochs (milliseconds)
@@ -28,10 +36,13 @@ def main(args):
             # decay algorithm here...
             deleteFromFilter(bf)
         if (t % arrivalInterval) == 0:
-            contents.append(generateNewContent())
+            # add a random new contnet to the set
+            randomContent = generateNewContent()
+            contents.append(randomContent)
         if (t % deletionInterval) == 0:
             # pick random element in content, delete it, remove it from contents
-            pass
+            target = random.sample(contents)
+            bf.delete(target)
 
         for content in contents:
             if not bf.contains(content):
