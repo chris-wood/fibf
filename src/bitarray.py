@@ -61,7 +61,7 @@ class CountingArray(object):
         return value
 
     def isEmpty(self, bit):
-        return (self.getCount(bit) == 0)
+        return (self.getValue(bit) == 0)
 
     def addAt(self, index):
         self.lock.acquire()
