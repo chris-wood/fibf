@@ -6,6 +6,7 @@ minimumTimeUnit = 1000 # milliseconds
 sequenceNumber = 1
 
 def deleteFromFilter(bf):
+        
     pass
 
 def generateNewContent():
@@ -14,10 +15,17 @@ def generateNewContent():
     sequenceNumber += 1
     return name
 
+def randomPool(n):
+    contents = []
+    for i in range(n):
+        contents.append(generateNewContent())
+    return contents
+
 # NOTE: this does not model the cache
 def main(args):
     global minimumTimeUnit
-    timeSteps = int(args[0]) % epochs (milliseconds)
+
+    timeSteps = int(args[0]) % epochs (milliseconds, according to the MTU)
     filterSize = int(args[1])
     filterHashes = int(args[2])
     decayInterval = int(args[3])
@@ -25,12 +33,13 @@ def main(args):
     arrivalInterval = (1 / arrivalRate) * minimumTimeUnit
     deletionRate = int(args[5]) % per second
     deletionInterval = (1 / deletionRate) * minimumTimeUnit
+    randomSampleSize = int(args[6])
 
     bf = CountingBloomFilter(filterSize, filterHashes)
 
     contents = []
-    numberOfFalsePositives = []
-    numberOfFalseNegatives = []
+    falsePositives = {}
+    falseNegatives = {}
     for t in range(timeSteps):
         if (t % decayInterface) == 0:
             # decay algorithm here...
@@ -44,10 +53,17 @@ def main(args):
             target = random.sample(contents)
             bf.delete(target)
 
+        falsePositives[t] = []
+        falseNegatives[t] = []
+
         for content in contents:
             if not bf.contains(content):
-                numberOfFalseNegatives.append(content)
-            pass # TODO: need to check against random values for false positive rate
+                falseNegatives[t].append(content)
+            randomContents = generateRandomContent(randomSampleSize)
+            for randomElement in randomContents:
+                if bf.contains(randomElement):
+                    falsePositives[t].append(randomElement)    
+        
         
 if __name__ == "__main__":
     main(sys.argv[1:])
