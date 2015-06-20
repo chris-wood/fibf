@@ -1,5 +1,6 @@
 import sys
 import random
+import time
 from bloom import *
 
 minimumTimeUnit = 1000 # milliseconds
@@ -20,7 +21,7 @@ def generateRandomContent(n):
         contents.append(generateNewContent())
     return contents
 
-# NOTE: this does not model the cache
+# NOTE: this does not model the cache (i.e., it assumes the router does not have a cache)
 def main(args):
     global minimumTimeUnit
 
@@ -29,12 +30,14 @@ def main(args):
     filterHashes = int(args[2])
     decayInterval = int(args[3])
     arrivalRate = int(args[4]) # per second
-    arrivalInterval = int(float(1 / float(arrivalRate)) * minimumTimeUnit)
     deletionRate = int(args[5]) # per second
-    deletionInterval = int(float(1 / float(deletionRate)) * minimumTimeUnit)
     randomSampleSize = int(args[6])
 
+    arrivalInterval = int(float(1 / float(arrivalRate)) * minimumTimeUnit)
+    deletionInterval = int(float(1 / float(deletionRate)) * minimumTimeUnit)
+
     print arrivalRate, arrivalInterval
+    print deletionRate, deletionInterval
 
     bf = CountingBloomFilter(filterSize, filterHashes)
 
@@ -57,14 +60,18 @@ def main(args):
 
         falsePositives[t] = []
         falseNegatives[t] = []
+
+        start = time.time()
         for content in contents:
             if not bf.contains(content):
-                falseNegatives[t].append(content)
+               falseNegatives[t].append(content)
             randomContents = generateRandomContent(randomSampleSize)
             for randomElement in randomContents:
                 if bf.contains(randomElement):
                     falsePositives[t].append(randomElement)
-
+        end = time.time()
+        
+        print "Time %d %f" % (t, end - start)
 
     for t in range(timeSteps):
         fp = float(len(falsePositives)) / randomSampleSize
