@@ -1,10 +1,17 @@
+import os
 import sys
 import random
 import time
+# from joblib import Parallel, delayed
 from bloom import *
 
 minimumTimeUnit = 1000 # milliseconds
 sequenceNumber = 1
+
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
 
 def deleteFromFilter(bf):
     pass
@@ -62,18 +69,22 @@ def main(args):
         falseNegatives[t] = []
 
         start = time.time()
-        for content in contents:
+
+        # for content in contents:
             # if not bf.contains(content):
-            #    falseNegatives[t].append(content)
-            randomContents = generateRandomContent(randomSampleSize)
-            for randomElement in randomContents:
-                if bf.contains(randomElement):
-                    falsePositives[t].append(randomElement)
+                # falseNegatives[t].append(content)
+
+        randomContents = generateRandomContent(randomSampleSize)
+        for randomElement in randomContents:
+            element = randomElement + str(os.urandom(1))
+            if bf.contains(element):
+                falsePositives[t].append(element)
+
         end = time.time()
 
         fp = float(len(falsePositives[t])) / randomSampleSize
-        fn = float(len(falseNegatives[t])) / randomSampleSize
-        print "Time %d %f %f %f" % (t, end - start, fn, fp)
+
+        print "Time %d %f %f" % (t, end - start, fp)
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize
