@@ -45,15 +45,12 @@ def main(args):
     # TODO: time between intervals needs to be modeled by poisson process
 
     for t in range(timeSteps):
-        if (t % decayInterval) == 0:
-            # decay algorithm here...
+        if (t % decayInterval) == 0: # decay algorithm here...
             deleteFromFilter(bf)
-        if (t % arrivalInterval) == 0:
-            # add a random new contnet to the set
+        if (t % arrivalInterval) == 0: # add a random new contnet to the set
             randomContent = generateNewContent()
             contents.append(randomContent)
-        if (t % deletionInterval) == 0:
-            # pick random element in content, delete it, remove it from contents
+        if (t % deletionInterval) == 0: # pick random element in content, delete it, remove it from contents
             if len(contents) > 1:
                 target = random.sample(contents, 1)[0]
                 bf.delete(target)
@@ -66,13 +63,13 @@ def main(args):
             randomContents = generateRandomContent(randomSampleSize)
             for randomElement in randomContents:
                 if bf.contains(randomElement):
-                    falsePositives[t].append(randomElement)    
-     
-    
+                    falsePositives[t].append(randomElement)
+
+
     for t in range(timeSteps):
         fp = float(len(falsePositives)) / randomSampleSize
         fn = float(len(falseNegatives)) / randomSampleSize
         print t, fp, fn
-        
+
 if __name__ == "__main__":
     main(sys.argv[1:])
