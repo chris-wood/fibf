@@ -109,7 +109,6 @@ def playWithFilter(n, k = 2):
     print "Contains the original string?", bf.contains(v1)
     print bf.array
 
-
     b2 = DecayingBloomFilter(n, 2, 0.5)
     b2.insert(v1)
     print b2.array
