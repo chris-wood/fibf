@@ -6,7 +6,6 @@ minimumTimeUnit = 1000 # milliseconds
 sequenceNumber = 1
 
 def deleteFromFilter(bf):
-        
     pass
 
 def generateNewContent():
@@ -15,7 +14,7 @@ def generateNewContent():
     sequenceNumber += 1
     return name
 
-def randomPool(n):
+def generateRandomContent(n):
     contents = []
     for i in range(n):
         contents.append(generateNewContent())
