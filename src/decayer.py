@@ -25,15 +25,17 @@ def randomPool(n):
 def main(args):
     global minimumTimeUnit
 
-    timeSteps = int(args[0]) % epochs (milliseconds, according to the MTU)
+    timeSteps = int(args[0]) * minimumTimeUnit # epochs (input is seconds and then multiplied by the MTU)
     filterSize = int(args[1])
     filterHashes = int(args[2])
     decayInterval = int(args[3])
-    arrivalRate = int(args[4]) % per second
-    arrivalInterval = (1 / arrivalRate) * minimumTimeUnit
-    deletionRate = int(args[5]) % per second
-    deletionInterval = (1 / deletionRate) * minimumTimeUnit
+    arrivalRate = int(args[4]) # per second
+    arrivalInterval = int(float(1 / float(arrivalRate)) * minimumTimeUnit)
+    deletionRate = int(args[5]) # per second
+    deletionInterval = int(float(1 / float(deletionRate)) * minimumTimeUnit)
     randomSampleSize = int(args[6])
+
+    print arrivalRate, arrivalInterval
 
     bf = CountingBloomFilter(filterSize, filterHashes)
 
@@ -41,7 +43,7 @@ def main(args):
     falsePositives = {}
     falseNegatives = {}
     for t in range(timeSteps):
-        if (t % decayInterface) == 0:
+        if (t % decayInterval) == 0:
             # decay algorithm here...
             deleteFromFilter(bf)
         if (t % arrivalInterval) == 0:
@@ -50,7 +52,7 @@ def main(args):
             contents.append(randomContent)
         if (t % deletionInterval) == 0:
             # pick random element in content, delete it, remove it from contents
-            target = random.sample(contents)
+            target = random.sample(contents, 1)[0]
             bf.delete(target)
 
         falsePositives[t] = []
