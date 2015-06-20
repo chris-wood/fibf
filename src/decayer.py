@@ -63,7 +63,12 @@ def main(args):
             for randomElement in randomContents:
                 if bf.contains(randomElement):
                     falsePositives[t].append(randomElement)    
-        
+     
+    
+    for t in range(timeSteps):
+        fp = float(len(falsePositives)) / randomSampleSize
+        fn = float(len(falseNegatives)) / randomSampleSize
+        print t, fp, fn
         
 if __name__ == "__main__":
     main(sys.argv[1:])
