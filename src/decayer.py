@@ -63,19 +63,21 @@ def main(args):
 
         start = time.time()
         for content in contents:
-            if not bf.contains(content):
-               falseNegatives[t].append(content)
+            # if not bf.contains(content):
+            #    falseNegatives[t].append(content)
             randomContents = generateRandomContent(randomSampleSize)
             for randomElement in randomContents:
                 if bf.contains(randomElement):
                     falsePositives[t].append(randomElement)
         end = time.time()
-        
-        print "Time %d %f" % (t, end - start)
+
+        fp = float(len(falsePositives[t])) / randomSampleSize
+        fn = float(len(falseNegatives[t])) / randomSampleSize
+        print "Time %d %f %f %f" % (t, end - start, fn, fp)
 
     for t in range(timeSteps):
-        fp = float(len(falsePositives)) / randomSampleSize
-        fn = float(len(falseNegatives)) / randomSampleSize
+        fp = float(len(falsePositives[t])) / randomSampleSize
+        fn = float(len(falseNegatives[t])) / randomSampleSize
         print t, fp, fn
 
 if __name__ == "__main__":
