@@ -8,6 +8,9 @@ from bloom import *
 minimumTimeUnit = 1000 # milliseconds
 sequenceNumber = 1
 
+def sampleExp(mean):
+    return 0
+
 def gcd(a, b):
     while b:
         a, b = b, a % b
