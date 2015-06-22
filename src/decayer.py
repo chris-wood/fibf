@@ -43,8 +43,8 @@ def main(args):
     arrivalInterval = int(float(1 / float(arrivalRate)) * minimumTimeUnit)
     deletionInterval = int(float(1 / float(deletionRate)) * minimumTimeUnit)
 
-    print arrivalRate, arrivalInterval
-    print deletionRate, deletionInterval
+    print >> sys.stderr, "Arrival info", arrivalRate, arrivalInterval
+    print >> sys.stderr, "Deletion info", deletionRate, deletionInterval
 
     bf = CountingBloomFilter(filterSize, filterHashes)
 
@@ -88,12 +88,13 @@ def main(args):
         fp = float(len(falsePositives[t])) / randomSampleSize
         counts[t] = len(contents)
 
-        print "Time %d %f %f" % (t, end - start, fp, len(counts)
+        print >> sys.stderr, "Time %d %f %f" % (t, end - start, fp, len(counts)
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize
         fn = float(len(falseNegatives[t])) / randomSampleSize
-        print t, fp, fn, counts[t]
+        print "%d,%f,%f,%d" % (t, fp, fn, counts[t])
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+
