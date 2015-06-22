@@ -11,7 +11,7 @@ sequenceNumber = 1
 def sampleExp(mean):
     u = random.random() # [0.0, 1.0)
     x = (-1 * math.log(1 - u)) / float(mean)
-    return x
+    return int(math.ceil(x))
 
 def gcd(a, b):
     while b:
@@ -40,17 +40,10 @@ def main(args):
     timeSteps = int(args[0]) * minimumTimeUnit # epochs (input is seconds and then multiplied by the MTU)
     filterSize = int(args[1])
     filterHashes = int(args[2])
-    decayRate = int(args[3])
-    arrivalRate = int(args[4]) # per second
-    deletionRate = int(args[5]) # per second
+    decayRate = float(args[3]) / minimumTimeUnit    # per second
+    arrivalRate = float(args[4]) / minimumTimeUnit  # per second
+    deleteRate = float(args[5]) / minimumTimeUnit # per second
     randomSampleSize = int(args[6])
-
-    decayInterval = int(float(1 / float(decayRate)) * minimumTimeUnit)
-    arrivalInterval = int(float(1 / float(arrivalRate)) * minimumTimeUnit)
-    deletionInterval = int(float(1 / float(deletionRate)) * minimumTimeUnit)
-
-    print >> sys.stderr, "Arrival info", arrivalRate, arrivalInterval
-    print >> sys.stderr, "Deletion info", deletionRate, deletionInterval
 
     bf = CountingBloomFilter(filterSize, filterHashes)
 
@@ -59,31 +52,29 @@ def main(args):
     falseNegatives = {}
     counts = {}
 
-    decayCounter = int(math.ceil(sampleExp(float(1) / float(decayRate))))
-    deleteCounter = int(math.ceil(sampleExp(float(1) / float(deletionRate))))
-    arrivalCounter = int(math.ceil(sampleExp(float(1) / float(arrivalRate))))
+    decayCounter = sampleExp(decayRate)
+    deleteCounter = sampleExp(deleteRate)
+    arrivalCounter = sampleExp(arrivalRate)
 
     print decayCounter, deleteCounter, arrivalCounter
 
     for t in range(timeSteps):
         if decayCounter == 0: # decay algorithm here...
-            decayCounter = int(math.ceil(sampleExp(float(1) / float(decayRate))))
+            decayCounter = sampleExp(decayRate)
             deleteFromFilter(bf)
-        if arrivalCounter == 0: # add a random new contnet to the set
-            print "arrival"
-            arrivalCounter = int(math.ceil(sampleExp(float(1) / float(arrivalRate))))
-            print "new counter %d" % (arrivalCounter)
+        if arrivalCounter == 0: # add a random new content to the set
+            arrivalCounter = sampleExp(arrivalRate)
             randomContent = generateNewContent()
             contents.append(randomContent)
         if deleteCounter == 0: # pick random element in content, delete it, remove it from contents
-            deleteCounter = int(math.ceil(sampleExp(float(1) / float(deletionRate))))
+            deleteCounter = sampleExp(deleteRate)
             if len(contents) > 1:
                 target = random.sample(contents, 1)[0]
                 bf.delete(target)
 
         decayCounter -= 1
         arrivalCounter -= 1
-        deleteCounter -= 1  
+        deleteCounter -= 1
 
         falsePositives[t] = []
         falseNegatives[t] = []
@@ -116,4 +107,3 @@ def main(args):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
