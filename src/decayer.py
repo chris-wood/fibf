@@ -107,7 +107,7 @@ def main(args):
         fp = float(len(falsePositives[t])) / randomSampleSize
         counts[t] = len(contents)
 
-        print >> sys.stderr, "Time %d %f %f %d" % (t, end - start, fp, len(counts))
+        print >> sys.stderr, "Time %d %f %f %d" % (t, end - start, fp, counts[t])
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize
