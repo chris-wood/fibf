@@ -51,6 +51,7 @@ def main(args):
     contents = []
     falsePositives = {}
     falseNegatives = {}
+    counts = {}
 
     # TODO: create counter for arrival and deletion based on poisson process
 
@@ -85,13 +86,14 @@ def main(args):
         end = time.time()
 
         fp = float(len(falsePositives[t])) / randomSampleSize
+        counts[t] = len(contents)
 
-        print "Time %d %f %f" % (t, end - start, fp)
+        print "Time %d %f %f" % (t, end - start, fp, len(counts)
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize
         fn = float(len(falseNegatives[t])) / randomSampleSize
-        print t, fp, fn
+        print t, fp, fn, counts[t]
 
 if __name__ == "__main__":
     main(sys.argv[1:])
