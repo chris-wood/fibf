@@ -13,9 +13,6 @@ def sampleExp(mean):
     x = (-1 * math.log(1 - u)) / float(mean)
     return x
 
-print sampleExp(10)
-sys.exit(1)
-
 def gcd(a, b):
     while b:
         a, b = b, a % b
@@ -43,11 +40,12 @@ def main(args):
     timeSteps = int(args[0]) * minimumTimeUnit # epochs (input is seconds and then multiplied by the MTU)
     filterSize = int(args[1])
     filterHashes = int(args[2])
-    decayInterval = int(args[3])
+    decayRate = int(args[3])
     arrivalRate = int(args[4]) # per second
     deletionRate = int(args[5]) # per second
     randomSampleSize = int(args[6])
 
+    decayInterval = int(float(1 / float(decayRate)) * minimumTimeUnit)
     arrivalInterval = int(float(1 / float(arrivalRate)) * minimumTimeUnit)
     deletionInterval = int(float(1 / float(deletionRate)) * minimumTimeUnit)
 
@@ -61,16 +59,31 @@ def main(args):
     falseNegatives = {}
     counts = {}
 
+    decayCounter = int(math.ceil(sampleExp(float(1) / float(decayRate))))
+    deleteCounter = int(math.ceil(sampleExp(float(1) / float(deletionRate))))
+    arrivalCounter = int(math.ceil(sampleExp(float(1) / float(arrivalRate))))
+
+    print decayCounter, deleteCounter, arrivalCounter
+
     for t in range(timeSteps):
-        if (t % decayInterval) == 0: # decay algorithm here...
+        if decayCounter == 0: # decay algorithm here...
+            decayCounter = int(math.ceil(sampleExp(float(1) / float(decayRate))))
             deleteFromFilter(bf)
-        if (t % arrivalInterval) == 0: # add a random new contnet to the set
+        if arrivalCounter == 0: # add a random new contnet to the set
+            print "arrival"
+            arrivalCounter = int(math.ceil(sampleExp(float(1) / float(arrivalRate))))
+            print "new counter %d" % (arrivalCounter)
             randomContent = generateNewContent()
             contents.append(randomContent)
-        if (t % deletionInterval) == 0: # pick random element in content, delete it, remove it from contents
+        if deleteCounter == 0: # pick random element in content, delete it, remove it from contents
+            deleteCounter = int(math.ceil(sampleExp(float(1) / float(deletionRate))))
             if len(contents) > 1:
                 target = random.sample(contents, 1)[0]
                 bf.delete(target)
+
+        decayCounter -= 1
+        arrivalCounter -= 1
+        deleteCounter -= 1  
 
         falsePositives[t] = []
         falseNegatives[t] = []
@@ -94,7 +107,7 @@ def main(args):
         fp = float(len(falsePositives[t])) / randomSampleSize
         counts[t] = len(contents)
 
-        print >> sys.stderr, "Time %d %f %f" % (t, end - start, fp, len(counts))
+        print >> sys.stderr, "Time %d %f %f %d" % (t, end - start, fp, len(counts))
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize
