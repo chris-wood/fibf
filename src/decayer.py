@@ -9,7 +9,12 @@ minimumTimeUnit = 1000 # milliseconds
 sequenceNumber = 1
 
 def sampleExp(mean):
-    return 0
+    u = random.random() # [0.0, 1.0)
+    x = (-1 * math.log(1 - u)) / float(mean)
+    return x
+
+print sampleExp(10)
+sys.exit(1)
 
 def gcd(a, b):
     while b:
@@ -56,8 +61,6 @@ def main(args):
     falseNegatives = {}
     counts = {}
 
-    # TODO: create counter for arrival and deletion based on poisson process
-
     for t in range(timeSteps):
         if (t % decayInterval) == 0: # decay algorithm here...
             deleteFromFilter(bf)
@@ -91,7 +94,7 @@ def main(args):
         fp = float(len(falsePositives[t])) / randomSampleSize
         counts[t] = len(contents)
 
-        print >> sys.stderr, "Time %d %f %f" % (t, end - start, fp, len(counts)
+        print >> sys.stderr, "Time %d %f %f" % (t, end - start, fp, len(counts))
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize
