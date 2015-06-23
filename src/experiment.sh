@@ -11,7 +11,7 @@ for ar in "${arrivalRates[@]}"
 do
     for dr in "${deletionRates[@]}"
     do
-        python decayer.py $TIME $BFSIZE $BFHASHES 1 $ar $dr $RANDOMSIZE
+        python decayer.py $TIME $BFSIZE $BFHASHES 1 $ar $dr $RANDOMSIZE > out_$TIME_$BFSIZE_$BFHASHES_1_$ar_$dr_$RANDOMSIZE.out
     done
 done
 
