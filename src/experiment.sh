@@ -1,7 +1,9 @@
 #!/bin/bash
 
 TIME=60
-arrivalRates=( 100 1000 10000 100000 )
+# assuming average 14 hops per link so arrivalRates is for each hop up to middle of the network
+# which are assumed to be core routers
+arrivalRates=( 28.45 142.25 711.25 3556.25 17781.25 88906.25 444531.25 )
 deletionRates=( 10 20 30 40 50 )
 bfsizes=( 128 192 256 )
 bfhashes=( 3 4 5 6 7 8 )
