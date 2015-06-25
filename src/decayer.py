@@ -8,9 +8,9 @@ from bloom import *
 minimumTimeUnit = 1000 # milliseconds
 sequenceNumber = 1
 
-def sampleExp(mean):
+def sampleExp(rate):
     u = random.random() # [0.0, 1.0)
-    x = (-1 * math.log(1 - u)) / float(mean)
+    x = (-1 * math.log(1 - u)) * float(rate)
     return int(math.ceil(x))
 
 def gcd(a, b):
@@ -37,12 +37,12 @@ def generateRandomContent(n):
 def main(args):
     global minimumTimeUnit
 
-    timeSteps = int(args[0]) * minimumTimeUnit # epochs (input is seconds and then multiplied by the MTU)
+    timeSteps = int(args[0]) # * minimumTimeUnit # epochs (input is seconds and then multiplied by the MTU)
     filterSize = int(args[1])
     filterHashes = int(args[2])
-    decayRate = float(args[3]) / minimumTimeUnit    # per second
-    arrivalRate = float(args[4]) / minimumTimeUnit  # per second
-    deleteRate = float(args[5]) / minimumTimeUnit # per second
+    decayRate = float(args[3]) # / minimumTimeUnit    # per second
+    arrivalRate = float(args[4]) # / minimumTimeUnit  # per second
+    deleteRate = float(args[5]) # / minimumTimeUnit # per second
     randomSampleSize = int(args[6])
 
     bf = CountingBloomFilter(filterSize, filterHashes)
@@ -52,29 +52,33 @@ def main(args):
     falseNegatives = {}
     counts = {}
 
-    decayCounter = sampleExp(decayRate)
-    deleteCounter = sampleExp(deleteRate)
-    arrivalCounter = sampleExp(arrivalRate)
+    decayCount = sampleExp(decayRate)
+    deleteCount = sampleExp(deleteRate)
+    arrivalCount = sampleExp(arrivalRate)
 
-    print decayCounter, deleteCounter, arrivalCounter
+    # for each one, mean = 1/rate
+    print arrivalRate, deleteRate, decayRate
+    print arrivalCount, deleteCount, decayCount
 
     for t in range(timeSteps):
-        if decayCounter == 0: # decay algorithm here...
-            decayCounter = sampleExp(decayRate)
+        for i in range(decayCount):
             deleteFromFilter(bf)
-        if arrivalCounter == 0: # add a random new content to the set
-            arrivalCounter = sampleExp(arrivalRate)
+        for i in range(arrivalCount):
             randomContent = generateNewContent()
             contents.append(randomContent)
-        if deleteCounter == 0: # pick random element in content, delete it, remove it from contents
-            deleteCounter = sampleExp(deleteRate)
+        for i in range(deleteCount):
             if len(contents) > 1:
                 target = random.sample(contents, 1)[0]
                 bf.delete(target)
 
-        decayCounter -= 1
-        arrivalCounter -= 1
-        deleteCounter -= 1
+        # decayCounter -= 1
+        decayCount = sampleExp(decayRate)
+        # arrivalCounter -= 1
+        arrivalCount = sampleExp(arrivalRate)
+        # deleteCounter -= 1
+        deleteCount = sampleExp(deleteRate)
+
+        print arrivalCount, deleteCount, decayCount
 
         falsePositives[t] = []
         falseNegatives[t] = []

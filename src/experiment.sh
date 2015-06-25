@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TIME=60
+TIME=3600
 # assuming average 14 hops per link so arrivalRates is for each hop up to middle of the network
 # which are assumed to be core routers
 arrivalRates=( 28.45 142.25 711.25 3556.25 17781.25 88906.25 444531.25 )
@@ -17,6 +17,7 @@ do
         do
             for bfhash in "${bfhashes[@]}"
             do
+                echo python decayer.py $TIME $bfsize $bfhash 1 $ar $dr $RANDOMSIZE
                 python decayer.py $TIME $bfsize $bfhash 1 $ar $dr $RANDOMSIZE > out_$TIME_$bfsize_$bfhash_1_$ar_$dr_$RANDOMSIZE.out
             done    
         done
