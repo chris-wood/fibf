@@ -33,7 +33,9 @@ def generateRandomContent(n):
         contents.append(generateNewContent())
     return contents
 
-# NOTE: this does not model the cache (i.e., it assumes the router does not have a cache)
+# NOTE: this does not model the cache (i.e., it assumes the router does not
+# have a cache, so everything goes into the filter)
+
 def main(args):
     global minimumTimeUnit
 
@@ -71,11 +73,8 @@ def main(args):
                 target = random.sample(contents, 1)[0]
                 bf.delete(target)
 
-        # decayCounter -= 1
         decayCount = sampleExp(decayRate)
-        # arrivalCounter -= 1
         arrivalCount = sampleExp(arrivalRate)
-        # deleteCounter -= 1
         deleteCount = sampleExp(deleteRate)
 
         print arrivalCount, deleteCount, decayCount
