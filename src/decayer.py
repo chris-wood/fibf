@@ -63,6 +63,8 @@ def main(args):
     print arrivalCount, deleteCount, decayCount
 
     for t in range(timeSteps):
+        start = time.time()
+        
         for i in range(decayCount):
             deleteFromFilter(bf)
         for i in range(arrivalCount):
@@ -77,12 +79,10 @@ def main(args):
         arrivalCount = sampleExp(arrivalRate)
         deleteCount = sampleExp(deleteRate)
 
-        print arrivalCount, deleteCount, decayCount
+        # print arrivalCount, deleteCount, decayCount
 
         falsePositives[t] = []
         falseNegatives[t] = []
-
-        start = time.time()
 
         # Check to see if decays deleted existing items from the filter
         for content in contents:
