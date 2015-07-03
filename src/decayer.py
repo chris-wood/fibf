@@ -70,10 +70,12 @@ def main(args):
         for i in range(arrivalCount):
             randomContent = generateNewContent()
             contents.append(randomContent)
+            bf.insert(randomContent)
         for i in range(deleteCount):
             if len(contents) > 1:
                 target = random.sample(contents, 1)[0]
                 bf.delete(target)
+                contents.remove(target)
 
         decayCount = sampleExp(decayRate)
         arrivalCount = sampleExp(arrivalRate)
@@ -85,23 +87,25 @@ def main(args):
         falseNegatives[t] = []
 
         # Check to see if decays deleted existing items from the filter
-        for content in contents:
+        for content in contents[:randomSampleSize]:
             if not bf.contains(content):
                 falseNegatives[t].append(content)
 
         # Check the false positive rate (by randomly generated samples)
         randomContents = generateRandomContent(randomSampleSize)
         for randomElement in randomContents:
-            element = randomElement + str(os.urandom(1))
-            if bf.contains(element):
+            element = randomElement + "/" + str(os.urandom(10))
+            if element not in contents and bf.contains(element):
                 falsePositives[t].append(element)
 
         end = time.time()
 
         fp = float(len(falsePositives[t])) / randomSampleSize
+        fn = float(len(falseNegatives[t])) / randomSampleSize
+        
         counts[t] = len(contents)
 
-        print >> sys.stderr, "Time %d %f %f %d" % (t, end - start, fp, counts[t])
+        print >> sys.stderr, "Time %d %f %f %f %d" % (t, end - start, fp, fn, counts[t])
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize
