@@ -65,12 +65,15 @@ def main(args):
         start = time.time()
         
         for i in range(decayCount):
+            print "decaying..."
             deleteFromFilter(bf)
         for i in range(arrivalCount):
+            print "arriving... %d" % (arrivalCount - i)
             randomContent = generateNewContent()
             contents.append(randomContent)
             bf.insert(randomContent)
         for i in range(deleteCount):
+            print "deleting... %d" % (deleteCount - i)
             if len(contents) > 1:
                 target = random.sample(contents, 1)[0]
                 # bf.delete(target)
@@ -85,17 +88,24 @@ def main(args):
         falsePositives[t] = []
         falseNegatives[t] = []
 
+        print >> sys.stderr, "Computing false negative probability..."
+
         # Check to see if decays deleted existing items from the filter
         for content in contents[:randomSampleSize]:
             if not bf.contains(content):
                 falseNegatives[t].append(content)
+
+        print >> sys.stderr, "Computing false positive probability..."
 
         # Check the false positive rate (by randomly generated samples)
         randomContents = generateRandomContent(randomSampleSize)
         for randomElement in randomContents:
             element = randomElement + "/" + str(os.urandom(10))
             if element not in contents and bf.contains(element):
+                print >> sys.stderr, "Found false positive :( %s" % (element)
                 falsePositives[t].append(element)
+            else:
+                print >> sys.stderr, "missed a false positive"
 
         end = time.time()
 
