@@ -58,9 +58,8 @@ def main(args):
     deleteCount = sampleExp(deleteRate)
     arrivalCount = sampleExp(arrivalRate)
 
-    # for each one, mean = 1/rate
-    print arrivalRate, deleteRate, decayRate
-    print arrivalCount, deleteCount, decayCount
+    # print arrivalRate, deleteRate, decayRate
+    # print arrivalCount, deleteCount, decayCount
 
     for t in range(timeSteps):
         start = time.time()
