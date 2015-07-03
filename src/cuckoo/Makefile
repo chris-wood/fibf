@@ -11,14 +11,19 @@ LDFLAGS+= -Wall -lpthread -lssl -lcrypto
 LIBOBJECTS = \
 	./hashutil.o \
 
-HEADERS = $(wildcard src/*.h)
+HEADERS = $(wildcard *.h)
 
 TEST = test
+DECAYER = decayer
 
-all: $(TEST)
+all: $(TEST) $(DECAYER)
 
 clean:
 	rm -f $(TEST) */*.o
+	rm -f $(DECAYER) */*.o
+
+decayer: decayer.o $(LIBOBJECTS)
+	$(CC) decayer.o $(LIBOBJECTS) $(LDFLAGS) -o $@
 
 test: test.o $(LIBOBJECTS) 
 	$(CC) test.o $(LIBOBJECTS) $(LDFLAGS) -o $@
