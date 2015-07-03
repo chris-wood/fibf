@@ -74,8 +74,8 @@ def main(args):
         for i in range(deleteCount):
             if len(contents) > 1:
                 target = random.sample(contents, 1)[0]
-                bf.delete(target)
-                contents.remove(target)
+                # bf.delete(target)
+                # contents.remove(target)
 
         decayCount = sampleExp(decayRate)
         arrivalCount = sampleExp(arrivalRate)
@@ -102,7 +102,7 @@ def main(args):
 
         fp = float(len(falsePositives[t])) / randomSampleSize
         fn = float(len(falseNegatives[t])) / randomSampleSize
-        
+
         counts[t] = len(contents)
 
         print >> sys.stderr, "Time %d %f %f %f %d" % (t, end - start, fp, fn, counts[t])
