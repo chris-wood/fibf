@@ -17,16 +17,17 @@ def falseNegative(m, k, n):
     for i in range(1, k + 1):
         emptyProb = probEmpty(m, k, n)
         nonEmptyProb = 1 - emptyProb
-        prob = comb(k, i) * (emptyProb ** k) * (nonEmptyProb ** (k - i))
-        acc += (i * prob)
+        reduction = (1 - (1 - (float(i) / (float(m) * nonEmptyProb))) ** k)
+        prob = comb(k, i) * (emptyProb ** i) * (nonEmptyProb ** (k - i)) * reduction
+        acc += prob
     return acc
 
 args = sys.argv[1:]
 m = int(args[0])
 k = int(args[1])
-nmax = int(args[2a])
+nmax = int(args[2])
 
-for i in range(nmax):
+for i in range(1, nmax):
     fp = falsePositive(m, k, i)
     fn = falseNegative(m, k, i) 
     print i, fp, fn
