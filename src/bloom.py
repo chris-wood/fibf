@@ -9,7 +9,7 @@ import binascii
 import hashlib
 import threading
 import time
-from Crypto.Cipher import AES
+# from Crypto.Cipher import AES
 from bitarray import *
 
 class BloomFilter(object):

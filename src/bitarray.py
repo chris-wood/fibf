@@ -75,7 +75,5 @@ class CountingArray(object):
         try:
             if self.array[index] > 0:
                 self.array[index] -= 1
-            else:
-                pass # this is not an exception
         finally:
             self.lock.release()
