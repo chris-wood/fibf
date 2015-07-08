@@ -33,36 +33,6 @@ class BitArray(object):
         index = index / self.indexSize
         self.array[index] = self.array[index] | (1 << offset)
 
-class ModuloArray(object):
-    ''' Implementation of a bitmap where each entry has O(nlogn) bits
-        that roll over when they overflow.
-
-        It is not thread safe.
-    '''
-    def __init__(self, length):
-        ''' Each entry is a rolling counter, not a single bit.
-        '''
-        self.length = length
-        self.array = [1,] * self.length # everything is initialized to 1 to start
-
-    def __str__(self):
-        return "ModuloArray["+ str(self.length) + "]: " + str(self.array)
-
-    def size(self):
-        return self.length
-
-    def expansionFactor(self, base):
-        return self.length / base
-
-    def getValue(self, index):
-        return self.array[index]
-
-    def isEmpty(self, bit):
-        return (self.getValue(bit) == 1)
-
-    def addAt(self, index, val):
-        self.array[index] = val
-
 class CountingArray(object):
     ''' Simple implementation of a counting bitmap.
 
@@ -96,17 +66,44 @@ class CountingArray(object):
     def isEmpty(self, bit):
         return (self.getValue(bit) == 0)
 
-    def addAt(self, index):
+    def addAt(self, index, N=1):
         self.lock.acquire()
         try:
-            self.array[index] += 1
+            self.array[index] += N
         finally:
             self.lock.release()
 
-    def removeAt(self, index):
+    def removeAt(self, index, N=1):
         self.lock.acquire()
         try:
             if self.array[index] > 0:
-                self.array[index] -= 1
+                self.array[index] -= N
         finally:
             self.lock.release()
+
+class ModuloArray(CountingArray):
+    ''' Implementation of a bitmap where each entry has O(nlogn) bits
+        that roll over when they overflow.
+
+        It is not thread safe.
+    '''
+    def __init__(self, length):
+        ''' Each entry is a rolling counter, not a single bit.
+        '''
+        self.length = length
+        self.array = [1,] * self.length # everything is initialized to 1 to start
+
+    def __str__(self):
+        return "ModuloArray["+ str(self.length) + "]: " + str(self.array)
+
+    def size(self):
+        return self.length
+
+    def expansionFactor(self, base):
+        return self.length / base
+
+    def getValue(self, index):
+        return self.array[index]
+
+    def isEmpty(self, bit):
+        return (self.getValue(bit) == 1)
