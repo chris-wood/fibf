@@ -4,6 +4,7 @@ import random
 import math
 import time
 from scaling_timing_bloom_filter import ScalingTimingBloomFilter
+from timing_bloom_filter import TimingBloomFilter
 import tornado.ioloop
 import tornado.testing
 import time
@@ -50,12 +51,13 @@ def main(args):
     decayRate = float(args[2]) #  # per second
     arrivalRate = float(args[3]) # / minimumTimeUnit  # per second
     deleteRate = float(args[4]) # / minimumTimeUnit # per second
-    randomSampleSize = int(args[6])
+    randomSampleSize = int(args[5])
 
     # bf = ScalingTimingBloomFilter(filterSize, filterHashes)
 
     ### Note: the decay time is real clock time, not simulated time
-    stbf = ScalingTimingBloomFilter(initialFilterSize, decay_time=100).start()
+    stbf = ScalingTimingBloomFilter(initialFilterSize, decay_time=decayRate).start()
+    # stbf = TimingBloomFilter(initialFilterSize, decay_time=decayRate).start()
 
     contents = []
     falsePositives = {}
@@ -95,7 +97,7 @@ def main(args):
         for randomElement in randomContents:
             element = randomElement + "/" + str(os.urandom(10))
             if element not in contents and stbf.contains(element):
-                print >> sys.stderr, "Found false positive :( %s" % (element)
+                # print >> sys.stderr, "Found false positive :( %s" % (element)
                 falsePositives[t].append(element)
 
         end = time.time()
@@ -104,8 +106,8 @@ def main(args):
         fn = float(len(falseNegatives[t])) / randomSampleSize
         counts[t] = len(contents)
 
-        if t % 100 == 0:
-            print >> sys.stderr, "Time %d %f %f %f %d" % (t, end - start, fp, fn, counts[t])
+        # if t % 100 == 0:
+        print >> sys.stderr, "Time %d %f %f %f %d" % (t, end - start, fp, fn, counts[t])
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize

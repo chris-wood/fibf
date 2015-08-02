@@ -139,7 +139,8 @@ class TimingBloomFilter(CountingBloomFilter):
         self._setup_decay()
         return self
 
-    def remove(self, *args, **kwargs):
+    def remove(self, key, timestamp=None):
+        tick = self._tick(timestamp)
         for index in self._indexes(key):
             self.num_non_zero -= (self.data[index] == 0)
             self.data[index] = tick
