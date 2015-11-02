@@ -9,8 +9,6 @@ bfsizes=( 1024 2048 4096 )
 RANDOMSIZE=100
 decayRate=1000
 
-
-
 for ar in "${arrivalRates[@]}"
 do
     for dr in "${deletionRates[@]}"

@@ -21,28 +21,28 @@ class ScalingTimingBloomFilter(object):
     has a fill percentage less than ``min_fill_factor``.  Together, these two
     fill factor conditionals attempt to keep the scaling bloom at the right
     size for the current stream of data.
-    
+
     :param capacity: initial capacity
     :type capacity: integer
-    
+
     :param decay_time: time, in seconds, for an item to decay
     :type decay_time: integer
-    
+
     :param error: maximum error rate
     :type error: float
-    
+
     :param error_tightening_ratio: reduction factor for the error rate of scaled blooms
     :type error_tightening_ratio: float
-    
+
     :param growth_factor: increasing factor for the capacity of scaled blooms
     :type growth_factor: float or None
-    
+
     :param max_fill_factor: maximum fill factor of a bloom to be considered full
     :type max_fill_factor: min_fill_factor < float < 1
 
     :param max_fill_factor: minimum fill factor of a bloom to be considered active
     :type max_fill_factor: 0 < float < max_fill_factor or None
-    
+
     :param insert_order: Whether to insert in order to optimize compactness or convergence
     :type insert_order: 'compact' or 'converge'
 
@@ -94,7 +94,7 @@ class ScalingTimingBloomFilter(object):
         self.ring_size = (1 << 8 / _ENTRIES_PER_8BYTE) - 1
         self.dN = self.ring_size / 2
         self.seconds_per_tick = self.decay_time / float(self.dN)
-        self.time_per_decay = self.seconds_per_tick * 1000.0 
+        self.time_per_decay = self.seconds_per_tick * 1000.0
         try:
             self.stop()
         except:
@@ -117,12 +117,12 @@ class ScalingTimingBloomFilter(object):
         self.blooms.append({
             "id" : _id,
             "new" : True,
-            "error" : error, 
+            "error" : error,
             "capacity" : capacity,
             "bloom" : TimingBloomFilter(
-                capacity = capacity, 
-                decay_time = self.decay_time, 
-                error = error, 
+                capacity = capacity,
+                decay_time = self.decay_time,
+                error = error,
             ),
         })
 
@@ -319,7 +319,7 @@ class ScalingTimingBloomFilter(object):
 
         self.insert_tail = True #TODO: have this be in the file
         self._ioloop = None
-        self._setup_decay()    
+        self._setup_decay()
         return self
 
     def __contains__(self, key):
@@ -361,7 +361,7 @@ if __name__ == "__main__":
 
     with TimingBlock("Decaying", 1):
         tbf.decay()
-    time.sleep(decay_time - time.time() + last_insert) 
+    time.sleep(decay_time - time.time() + last_insert)
     with TimingBlock("Decaying", 1):
         tbf.decay()
 
