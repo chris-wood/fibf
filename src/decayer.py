@@ -138,10 +138,12 @@ def test():
         if stbf.contains("idx_%d" % i):
             print "WTF 3 %d" %(i)
 
+    print "done"
+
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         for i in range(100):
             print i, sampleExp(i)
-        # test()
+        test()
     else:
         main(sys.argv[1:])
