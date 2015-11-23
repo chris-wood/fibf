@@ -4,7 +4,7 @@ import numpy as np
 import struct
 import math
 import mmh3
-
+import sys
 
 class CountingBloomFilter(object):
     _ENTRIES_PER_8BYTE = 1
@@ -16,6 +16,11 @@ class CountingBloomFilter(object):
 
         size = int(math.ceil(self.num_bytes / self._ENTRIES_PER_8BYTE))
         self.data = np.zeros((size,), dtype=np.uint8, order='C')
+
+    def _all_indexes(self):
+        print >>  sys.stderr, "num_bytes = %d" %(self.num_bytes)
+        for i in xrange(self.num_bytes):
+            yield i
 
     def _indexes(self, key):
         """
@@ -61,7 +66,7 @@ class CountingBloomFilter(object):
         return all(self.data[index] != 0 for index in self._indexes(key))
 
     def size(self):
-        return -self.num_bytes * math.log(1 - self.num_non_zero / float(self.num_bytes)) / float(self.num_hashes) 
+        return -self.num_bytes * math.log(1 - self.num_non_zero / float(self.num_bytes)) / float(self.num_hashes)
 
     COUNTING_HEADER = "QdQQ"
     def tofile(self, f):
@@ -95,5 +100,3 @@ class CountingBloomFilter(object):
 
     def __len__(self):
         return self.size()
-
-

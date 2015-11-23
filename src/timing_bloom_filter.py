@@ -5,6 +5,7 @@ import tornado.ioloop
 import tornado.testing
 import struct
 import time
+import sys
 
 try:
     import _optimizations
@@ -144,6 +145,13 @@ class TimingBloomFilter(CountingBloomFilter):
         for index in self._indexes(key):
             self.num_non_zero -= (self.data[index] == 0)
             self.data[index] = tick
+        return self
+
+    def removeRandom(self, timestamp=None):
+        tick = self._tick(timestamp)
+        # print >> sys.stderr, "start"
+        CountingBloomFilter.remove_all(self, 1)
+        # print >> sys.stderr, "done"
         return self
 
     def remove_all(self, *args, **kwargs):

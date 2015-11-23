@@ -203,6 +203,35 @@ class ScalingTimingBloomFilter(object):
         cur_bloom["new"] = False
         return self
 
+    def removeRandom(self, timestamp=None):
+        """
+        Add key to the bloom filter and scale if necissary.  The key will be
+        inserted at the current timestamp if parameter ``timestamp`` is not
+        provided.
+
+        :param key: key to be added
+        :type key: str
+
+        :param timestamp: timestamp of the item
+        :type timestamp: int
+        """
+        cur_bloom = None
+        bloom_iter = None
+        if self.insert_tail:
+            bloom_iter = reversed(self.blooms)
+        else:
+            bloom_iter = iter(self.blooms)
+        for bloom in bloom_iter:
+            if bloom["bloom"].size() < self.max_fill_factor * bloom["capacity"]:
+                cur_bloom = bloom
+                break
+        if cur_bloom is None:
+            self._add_new_bloom()
+            cur_bloom = self.blooms[-1]
+        cur_bloom["bloom"].removeRandom(timestamp)
+        cur_bloom["new"] = False
+        return self
+
     def contains(self, key):
         """
         Check if key is contained in the bloom filter

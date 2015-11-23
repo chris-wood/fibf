@@ -43,7 +43,7 @@ def generateRandomContent(n):
 # NOTE: this does not model the cache (i.e., it assumes the router does not
 # have a cache, so everything goes into the filter)
 
-def main(args):
+def run_experiment(stbf, filter_type, args):
     global minimumTimeUnit
 
     timeSteps = int(args[0]) # number of epochs (could be ns, us, ms, or s)
@@ -52,12 +52,6 @@ def main(args):
     arrivalRate = float(args[3]) # / minimumTimeUnit  # per second
     deleteRate = float(args[4]) # / minimumTimeUnit # per second
     randomSampleSize = int(args[5])
-
-    # bf = ScalingTimingBloomFilter(filterSize, filterHashes)
-
-    ### Note: the decay time is real clock time, not simulated time
-    stbf = ScalingTimingBloomFilter(initialFilterSize, decay_time=decayRate).start()
-    # stbf = TimingBloomFilter(initialFilterSize, decay_time=decayRate).start()
 
     contents = []
     falsePositives = {}
@@ -75,11 +69,13 @@ def main(args):
             randomContent = generateNewContent()
             contents.append(randomContent) # now in the set
             stbf += randomContent
+        # print >> sys.stderr, "DELETE %d" % (deleteCount)
         for i in range(deleteCount):
             if len(contents) > 1:
                 target = random.sample(contents, 1)[0]
-                stbf.remove(target)
-                contents.remove(target) # no longer actually in the set
+                # stbf.remove(target) # doh!
+                stbf.removeRandom() # this decrements *every* slot randomly...
+                # contents.remove(target) # no longer actually in the set
 
         arrivalCount = sampleExp(arrivalRate) # number of arrivals in each epoch
         deleteCount = sampleExp(deleteRate) # number of deletions (randomly sampled) in each epoch
@@ -88,6 +84,7 @@ def main(args):
         falseNegatives[t] = []
 
         # Check to see if decays deleted existing items from the filter
+        random.shuffle(contents)
         for content in contents[:randomSampleSize]:
             if not stbf.contains(content):
                 falseNegatives[t].append(content)
@@ -107,12 +104,27 @@ def main(args):
         counts[t] = len(contents)
 
         # if t % 100 == 0:
-        print >> sys.stderr, "Time %d %f %f %f %d" % (t, end - start, fp, fn, counts[t])
+        print >> sys.stderr, "%s,%d,%f,%f,%f,%d" % (filter_type, t, end - start, fp, fn, counts[t])
 
     for t in range(timeSteps):
         fp = float(len(falsePositives[t])) / randomSampleSize
         fn = float(len(falseNegatives[t])) / randomSampleSize
-        print "%d,%f,%f,%d" % (t, fp, fn, counts[t])
+        print "%s,%d,%f,%f,%d" % (filter_type, t, fp, fn, counts[t])
+
+def main(args):
+    timeSteps = int(args[0]) # number of epochs (could be ns, us, ms, or s)
+    initialFilterSize = int(args[1])
+    decayRate = float(args[2]) #  # per second
+    arrivalRate = float(args[3]) # / minimumTimeUnit  # per second
+    deleteRate = float(args[4]) # / minimumTimeUnit # per second
+    randomSampleSize = int(args[5])
+
+    stbf = ScalingTimingBloomFilter(initialFilterSize, decay_time=decayRate).start()
+    run_experiment(stbf, "ScalingTiming", args)
+
+    # Timing BF is not run because it takes far too long to index
+#    stbf = TimingBloomFilter(initialFilterSize, decay_time=decayRate).start()
+#    run_experiment(stbf, "Timing", args)
 
 def test():
     stbf = ScalingTimingBloomFilter(500, decay_time=4).start()
@@ -147,4 +159,3 @@ if __name__ == "__main__":
         test()
     else:
         main(sys.argv[1:])
-
