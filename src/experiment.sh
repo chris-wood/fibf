@@ -1,7 +1,11 @@
 #!/bin/bash
 
+<<<<<<< HEAD
 # experiment time
 TIME=1000
+=======
+TIME=3600
+>>>>>>> 4ccc88aa63a4fd71c154c2bcfb14c14144ffc0d9
 
 # assuming average 14 hops per link so arrivalRates is for each hop up to middle of the network
 # which are assumed to be core routers
